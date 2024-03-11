@@ -27,7 +27,8 @@ int main(){
     cv::Mat gImage = cv::imread("images/checkerboard_18x18.png", 0);
     //This will show our matrix for this simple square image -- 18 rows and 18 columns
     std::cout << gImage << "\n\n";
-     std::cout << "Grayscale matrix attributes\n";
+
+    std::cout << "Grayscale matrix attributes\n";
     std::cout << "Pixel dimensions of our image: " << gImage.size << "\n";
     std::cout << "Data type of each matrix element: " << gImage.type() << "\n";
     std::cout << "Number of channels: " << gImage.channels() << "\n";
@@ -35,8 +36,6 @@ int main(){
     //Read in a color image
     std::cout << "Color matrix attributes\n";
     cv::Mat cImage = cv::imread("images/coca-cola-logo.png", 1);
-
-    //Attributes -- This shows the resolution in pixels
     std::cout << "Pixel dimensions of our image: " << cImage.size << "\n";
     std::cout << "Data type of each matrix element: " << cImage.type() << "\n";
     std::cout << "Number of channels: " << cImage.channels() << "\n";
@@ -48,7 +47,6 @@ int main(){
     cv::waitKey(0);
     
     //Splitting and merging channels
-    //Define a vector that will contain cv::Mat objects
     std::vector<cv::Mat> bgrChannels;
     cv::split(cImage, bgrChannels);
     //Show the individual channels -- Recall that 0 is black and 255 is white
@@ -78,7 +76,7 @@ int main(){
     //Convert to HSV - modify the hue channel - convert back to BGR
     cv::Mat nzImageCopy;
     cv::cvtColor(nzImage, nzImageCopy, cv::COLOR_BGR2HSV);
-    //Break the image into its channels
+
     std::vector<cv::Mat> hsvChannels;
     cv::split(nzImageCopy, hsvChannels);
     //Modify the hue channel
@@ -92,14 +90,6 @@ int main(){
 
     //Save the Modified New Zealand Image
     cv::imwrite("images/mod_new_zealand.jpg", modifiedNZImage);
-
-
-
-
-
-
-
-
 
     return 0;
 }
