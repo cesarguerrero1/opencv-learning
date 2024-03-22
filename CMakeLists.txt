@@ -15,4 +15,5 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 #This tells CMake to create an executable with the following name based on the specified source files
 add_executable(main main.cpp)
 
+#We need to inform the linker about the OpenCV libraries
 target_link_libraries(main ${OpenCV_LIBS})

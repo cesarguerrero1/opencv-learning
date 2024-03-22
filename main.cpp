@@ -20,8 +20,21 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
+//Function Prototypes
+void opencvBasics();
+void imageManipulation();
+void imageAnnotation();
+
 int main(){
 
+    //opencvBasics();
+    //imageManipulation();
+    imageAnnotation();
+
+    return 0;
+}
+
+void opencvBasics(){
     //Reading in an image in grayscale
     std::cout << "Displaying grayscale matrix\n";
     cv::Mat gImage = cv::imread("images/checkerboard_18x18.png", 0);
@@ -91,6 +104,72 @@ int main(){
     //Save the Modified New Zealand Image
     cv::imwrite("images/mod_new_zealand.jpg", modifiedNZImage);
 
-    return 0;
+    return;
 }
 
+
+void imageManipulation(){
+
+    auto image = cv::imread("images/checkerboard_18x18.png", cv::IMREAD_GRAYSCALE);
+    cv::imshow("Image Manipulation", image);
+    cv::waitKey(0);
+    
+    std::cout << "Pixel at 0,0: " << (int)image.at<uchar>(0,0) << "\n";
+    std::cout << "Pixel at 0,6: " << (int)image.at<uchar>(0,6) << "\n";
+
+    //Modify pixels
+    auto imageCopy = image.clone();
+    imageCopy.at<uchar>(2,2) = 200;
+    imageCopy.at<uchar>(2,3) = 200;
+    imageCopy.at<uchar>(3,2) = 200;
+    imageCopy.at<uchar>(3,3) = 200;
+    std::cout << imageCopy << "\n";
+    cv::imshow("Modified Image", imageCopy);
+    cv::waitKey(0);
+
+    //We can crop an image by doing the following:
+    auto checkerboardColor = cv::imread("images/checkerboard_color.png", cv::IMREAD_COLOR);
+    cv::imshow("Color Checkerboard", checkerboardColor);
+    cv::waitKey(0);
+
+    //(900,900) is the middle of that image
+    cv::Range rowRange(700,1100);
+    cv::Range colRange(700,1100);
+    auto croppedCheckerboard = cv::Mat(checkerboardColor, rowRange, colRange);
+    std::cout << "The size of the cropped image is: " << croppedCheckerboard.size << "\n";
+    cv::imshow("Cropped Checkerboard", croppedCheckerboard);
+    cv::waitKey(0);
+
+
+    //Resizing Images
+    cv::Mat resizedImage;
+    //Notice that if we leave size as (0,0) we can specify the scaling factors in x and y
+    cv::resize(croppedCheckerboard, resizedImage, cv::Size(), 2, 2);
+    std::cout << "The new size of the image is: " << resizedImage.size << "\n";
+    cv::imshow("Resized Checkerboard", resizedImage);
+    cv::waitKey(0);
+
+    //We can also maintain an aspect ratio
+    cv::Mat resizedImage2;
+    int width = 100;
+    float aspectRatio = width / (float)croppedCheckerboard.size().width;
+    int calculatedHeight = croppedCheckerboard.size().height * aspectRatio;
+    cv::resize(croppedCheckerboard, resizedImage2, cv::Size(width, calculatedHeight)); 
+    std::cout << "The new size of the image is: " << resizedImage2.size << "\n";
+    cv::imshow("Resized Checkerboard 2", resizedImage2);
+    cv::waitKey(0);
+
+
+    //Flipping an image
+    cv::Mat flippedImage;
+    //0 is flipping vertically, 1 is flipping horizontally, -1 is flipping both
+    cv::flip(checkerboardColor, flippedImage, -1);
+    cv::imshow("Flipped Checkerboard", flippedImage);
+    cv::waitKey(0);
+
+    return;
+};
+
+void imageAnnotation(){
+
+}
