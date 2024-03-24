@@ -24,12 +24,14 @@
 void opencvBasics();
 void imageManipulation();
 void imageAnnotation();
+void imageEnhancement();
 
 int main(){
 
     //opencvBasics();
     //imageManipulation();
-    imageAnnotation();
+    //imageAnnotation();
+    imageEnhancement();
 
     return 0;
 }
@@ -107,7 +109,6 @@ void opencvBasics(){
     return;
 }
 
-
 void imageManipulation(){
 
     auto image = cv::imread("images/checkerboard_18x18.png", cv::IMREAD_GRAYSCALE);
@@ -171,5 +172,140 @@ void imageManipulation(){
 };
 
 void imageAnnotation(){
+    //Read in the apollo image
+    cv::Mat apolloImage = cv::imread("./images/Apollo_11_Launch.jpg", cv::IMREAD_COLOR);
+    cv::imshow("Apollo Image", apolloImage);
+    cv::waitKey(0);
 
-}
+    //Copying our image and adding a line
+    cv::Mat apolloWithLine = apolloImage.clone();
+    //Remember that openCV uses BGR -- cv::Scalar(blue, green, red, alpha)
+    cv::line(apolloWithLine, cv::Point(200,100), cv::Point(400, 100), cv::Scalar(0,0,255,1), 5);
+    cv::imshow("Apollo Image with Line", apolloWithLine);
+    cv::waitKey(0);
+
+
+    //Copying our image and adding a circle
+    cv::Mat apolloWithCircle = apolloImage.clone();
+    cv::circle(apolloWithCircle, cv::Point(900,500), 100, cv::Scalar(0,255,0,1), 5);
+    cv::imshow("Apollo Image with Circle", apolloWithCircle);
+    cv::waitKey(0);
+
+    //Copying our image and adding a rectangle
+    cv::Mat apolloWithRectangle = apolloImage.clone();
+    cv::rectangle(apolloWithRectangle, cv::Point(500, 100), cv::Point(700,600), cv::Scalar(255,0,0,1), 5);
+    cv::imshow("Apollo Image with Rectangle", apolloWithRectangle);
+    cv::waitKey(0);
+
+    //Copying our image and adding text
+    cv::Mat apolloWithText = apolloImage.clone();
+    cv::putText(apolloWithText, "Apollo 11 Launch", cv::Point(200, 700), cv::FONT_HERSHEY_TRIPLEX, 2.3, cv::Scalar(255,255,255,1), -1);
+    cv::imshow("Apollo Image with Text", apolloWithText);
+    cv::waitKey(0);
+
+};
+
+void imageEnhancement(){
+    
+    //Read in our image
+    auto image = cv::imread("images/New_Zealand_Coast.jpg", cv::IMREAD_COLOR);
+    cv::imshow("New Zealand Coast", image);
+    cv::waitKey(0);
+
+    //Matrix variables
+    cv::Mat darkerImage;
+    cv::Mat brighterImage;
+
+    //Scalar
+    auto intensity = cv::Scalar(50,50,50);
+    //Brightness Changes
+    cv::add(image, intensity, brighterImage);
+    cv::subtract(image, intensity, darkerImage);
+    cv::imshow("Brighter New Zealand Coast", brighterImage);
+    cv::waitKey(0);
+    cv::imshow("Darker New Zealand Coast", darkerImage);
+    cv::waitKey(0);
+
+
+    //Contrast Changes
+    cv::Mat lowContrastImage;
+    cv::Mat highContrastImage;
+    cv::Mat contrastImage;
+
+    //Change constrant
+    cv::multiply(image, .8, lowContrastImage);
+    cv::multiply(image, 1.2, highContrastImage);
+    cv::convertScaleAbs(image, contrastImage, 2, 0);
+
+    cv::imshow("Low Contrast New Zealand Coast", lowContrastImage);
+    cv::waitKey(0);
+    cv::imshow("High Contrast New Zealand Coast", highContrastImage);
+    cv::waitKey(0);
+    cv::imshow("Contrast New Zealand Coast", contrastImage);
+    cv::waitKey(0);
+
+
+    //Thresholding
+    cv::Mat building = cv::imread("images/building-windows.jpg", cv::IMREAD_GRAYSCALE);
+    cv::Mat thresholdImage;
+    cv::threshold(building, thresholdImage, 125, 255, cv::THRESH_BINARY);
+    cv::imshow("Thresholded Building", thresholdImage);
+    cv::waitKey(0);
+
+    //Thresholding Application - Parsing Sheetmusic
+    cv::Mat sheetMusic = cv::imread("images/Piano_Sheet_Music.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat thresholdSheetMusic;
+    cv::threshold(sheetMusic, thresholdSheetMusic, 65, 255, cv::THRESH_BINARY);
+    cv::imshow("Thresholded Sheet Music", thresholdSheetMusic);
+    cv::waitKey(0);
+
+    //Adaptive Thresholding - Parsing Sheetmusic
+    cv::Mat adaptiveThresholdSheetMusic;
+    cv::adaptiveThreshold(sheetMusic, adaptiveThresholdSheetMusic, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 11, 7);
+    cv::imshow("Adaptive Thresholded Sheet Music", adaptiveThresholdSheetMusic);
+    cv::waitKey(0);
+
+
+    //Bitwise Operations
+    cv::Mat coke = cv::imread("images/coca-cola-logo.png", cv::IMREAD_COLOR);
+    cv::Mat colorCheck = cv::imread("images/checkerboard_color.png", cv::IMREAD_COLOR);
+
+    //Make sure the checkerboard is the same size as the coke image
+    int width = coke.size().width;
+    float aspectRatio = width / (float)(colorCheck.size().width);
+    int calculatedHeight = colorCheck.size().height * aspectRatio;
+    cv::resize(colorCheck, colorCheck, cv::Size(width, calculatedHeight));
+    std::cout << "The size of the checkerboard is: " << colorCheck.size << "\n";
+
+    //Coca Cola mask
+    cv::Mat cokeGrey;
+    cv::cvtColor(coke, cokeGrey, cv::COLOR_BGR2GRAY);
+    cv::Mat cokeMaskRegular;
+    cv::Mat cokeMaskInverse;
+    cv::threshold(cokeGrey, cokeMaskRegular, 127, 255, cv::THRESH_BINARY);
+    cv::threshold(cokeGrey, cokeMaskInverse, 127, 255, cv::THRESH_BINARY_INV);
+    cv::imshow("Coca Cola Mask", cokeMaskRegular);
+    cv::waitKey(0);
+    cv::imshow("Coca Cola Inverse Mask", cokeMaskInverse);
+    cv::waitKey(0);
+
+    //Apply the mask
+    cv::Mat imgBackground;
+    cv::bitwise_and(colorCheck, colorCheck, imgBackground, cokeMaskRegular);
+    cv::imshow("Coca Cola Mask Applied", imgBackground);
+    cv::waitKey(0);
+
+    cv::Mat imgForeground;
+    cv::bitwise_and(coke, coke, imgForeground, cokeMaskInverse);
+    cv::imshow("Coca Cola Inverse Mask Applied", imgForeground);
+    cv::waitKey(0);
+
+    //Finally combine the two images
+    cv::Mat finalImage;
+    cv::add(imgBackground, imgForeground, finalImage);
+    cv::imshow("Final Image", finalImage);
+    cv::waitKey(0);
+
+
+    return;
+};
