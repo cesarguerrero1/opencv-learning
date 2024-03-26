@@ -29,7 +29,36 @@ int main(){
         cv::imshow("Video Feed", frame);
         
     }
-    
-    //The VideoCapture object will be automatically released when the program ends
+
+    //This is redudant - The destructure will automatically release the VideoCapture object
+    captureSource.release();
+
+    //Writing to a video file to disk
+    cv::VideoCapture videoSource;
+    videoSource.open("./race_car.mp4");
+    if(videoSource.isOpened() == false){
+        std::cerr << "Error: Video file not found\n";
+        return 1;
+    }
+
+    //Writing to a video file
+    cv::Size frameSize(videoSource.get(cv::CAP_PROP_FRAME_WIDTH), videoSource.get(cv::CAP_PROP_FRAME_HEIGHT)); //Get the frame size
+    std::cout << "Number of Frames: " << videoSource.get(cv::CAP_PROP_FRAME_COUNT) << std::endl;
+    //Create a videoWriter Object
+    cv::VideoWriter aviWriter("race_care_out.avi", cv::VideoWriter::fourcc('M','J','P','G'), 10, frameSize);
+    cv::VideoWriter mp4Writer("race_car_out.mp4", cv::VideoWriter::fourcc('m', 'p', '4', 'v'), 10, frameSize);
+
+    cv::Mat videoFrame;
+    while(videoSource.read(videoFrame)){
+        //Now that we have our video frame, we can write it to the video file
+        aviWriter.write(videoFrame);
+        mp4Writer.write(videoFrame);
+    }
+
+    //Now we can release the video source and the video writer -- This is REDUNDANT
+    videoSource.release();
+    aviWriter.release();
+    mp4Writer.release();
+
     return 0;
 }

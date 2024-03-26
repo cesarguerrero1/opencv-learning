@@ -4,3 +4,5 @@ main
 cmake_install.cmake
 CMakeCache.txt
 Makefile
+*.mp4
+*.avi
